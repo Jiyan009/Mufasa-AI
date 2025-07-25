@@ -66,33 +66,40 @@ def render_tiger_mascot(tiger_mascot, state):
     tiger_html = get_simple_tiger_html(state=state, animation_class=animation_class)
     st.markdown(tiger_html, unsafe_allow_html=True)
 
+# ✅ ✅ ✅ UPDATED: WeatherAPI version
 def get_weather(city: str):
     api_key = st.secrets.get("WEATHER_API_KEY", "default_weather_api_key")
-    base_url = "http://api.openweathermap.org/data/2.5/weather"
+    base_url = "http://api.weatherapi.com/v1/current.json"
     params = {
+        "key": api_key,
         "q": city,
-        "appid": api_key,
-        "units": "metric"
+        "aqi": "no"
     }
     try:
         response = requests.get(base_url, params=params)
         data = response.json()
         if response.status_code == 200:
-            weather_desc = data["weather"][0]["description"].title()
-            temp = data["main"]["temp"]
-            feels_like = data["main"]["feels_like"]
-            humidity = data["main"]["humidity"]
-            wind_speed = data["wind"]["speed"]
+            location = data["location"]["name"]
+            region = data["location"]["region"]
+            country = data["location"]["country"]
+            temp_c = data["current"]["temp_c"]
+            feelslike_c = data["current"]["feelslike_c"]
+            condition = data["current"]["condition"]["text"]
+            humidity = data["current"]["humidity"]
+            wind_kph = data["current"]["wind_kph"]
+
             result = (
-                f"**Weather in {city.title()}**\n"
-                f"- Condition: {weather_desc}\n"
-                f"- Temperature: {temp}°C (Feels like {feels_like}°C)\n"
+                f"**Weather in {location}, {region}, {country}**\n"
+                f"- Condition: {condition}\n"
+                f"- Temperature: {temp_c}°C (Feels like {feelslike_c}°C)\n"
                 f"- Humidity: {humidity}%\n"
-                f"- Wind Speed: {wind_speed} m/s"
+                f"- Wind Speed: {wind_kph} kph"
             )
             return result
         else:
-            return f"❌ Could not fetch weather: {data.get('message', 'Unknown error')}"
+            error_message = data.get("error", {}).get("message", "Unknown error")
+            return f"❌ Could not fetch weather: {error_message}"
+
     except Exception as e:
         return f"❌ Error fetching weather: {str(e)}"
 
