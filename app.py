@@ -219,7 +219,7 @@ def main():
 
     with st.sidebar:
         st.markdown("### 🦁 Mufasa - Your AI Companion")
-        st.markdown("Mufasa is your wise AI assistant created by **Jeet Borah**, always ready to help.")
+        st.markdown("Mufasa is your wise AI assistant created by **Jeet Borah**, Powered by Sarvam AI, always ready to help.")
         welcome_msg = language_support.get_welcome_message(st.session_state.selected_language)
         st.info(welcome_msg)
         st.markdown("### 🌐 Language Features")
