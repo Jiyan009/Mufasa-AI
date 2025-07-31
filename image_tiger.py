@@ -63,9 +63,9 @@ def get_simple_tiger_html(state="idle", animation_class=""):
     tiger_chars = {
         "idle": "🐯",
         "thinking": "🤔🐯", 
-        "happy": "😸🐯",
+        "happy": "🐯🐯",
         "excited": "🤩🐯",
-        "sad": "😿🐯",
+        "sad": "🐯X🐯",
         "confused": "😵🐯",
         "celebrating": "🥳🐯"
     }
