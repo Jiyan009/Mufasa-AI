@@ -1,6 +1,6 @@
 # Mufasa AI - Wise AI Companion
 
-A multilingual AI chat application powered by Sarvam AI, featuring Mufasa AI - an intelligent conversational companion created by **Jeet Borah** (Jeet Bhai) with advanced language support and dynamic interactions.
+A multilingual AI chat application powered by Sarvam AI, featuring Mufasa AI - an intelligent conversational companion created by **Jeet Borah** with advanced language support and dynamic interactions powered by Sarvam AI.
 
 ## Features
 
@@ -198,5 +198,5 @@ For issues related to:
 
 ---
 
-**Created by:** Jeet Borah (Jeet Bhai) - IT Geek & Developer  
+**Created by:** Jeet Borah- IT Geek & Developer  
 **Built with:** ❤️ using Streamlit and Sarvam AI
