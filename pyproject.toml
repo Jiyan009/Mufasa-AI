@@ -7,7 +7,9 @@ requires-python = ">=3.11"
 dependencies = [
     "streamlit>=1.47.0",
     "requests>=2.32.4",
+    "serpapi>=0.1.4"  # ✅ Add this line
 ]
 
 [tool.poetry]
 package-mode = false
+
