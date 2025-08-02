@@ -1,7 +1,6 @@
 import streamlit as st
 import time
 import requests
-from serpapi import GoogleSearch  # 🆕 SERPAPI
 from sarvam_client import SarvamClient
 from tiger_mascot import TigerMascot
 from image_tiger import get_simple_tiger_html
@@ -15,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Initialize Sarvam client
+# Initialize Sarvam client using st.secrets
 @st.cache_resource
 def get_sarvam_client():
     api_key = st.secrets.get("SARVAM_API_KEY", "default_api_key")
@@ -32,6 +31,7 @@ def get_language_support():
     return LanguageSupport()
 
 def initialize_session_state():
+    """Initialize session state variables"""
     if "messages" not in st.session_state:
         st.session_state.messages = []
     if "dark_mode" not in st.session_state:
@@ -44,16 +44,20 @@ def initialize_session_state():
         st.session_state.auto_translate = False
 
 def apply_dark_theme():
+    """Dark theme styling"""
     return """
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
+    /* Add your dark theme styles here */
     </style>
     """
 
 def apply_light_theme():
+    """Light theme styling"""
     return """
     <style>
     .stApp { background-color: #0e1117; color: #ffffff; }
+    /* Add your light theme styles here */
     </style>
     """
 
@@ -62,7 +66,7 @@ def render_tiger_mascot(tiger_mascot, state):
     tiger_html = get_simple_tiger_html(state=state, animation_class=animation_class)
     st.markdown(tiger_html, unsafe_allow_html=True)
 
-# ✅ Weather function
+# ✅ ✅ ✅ UPDATED: WeatherAPI version
 def get_weather(city: str):
     api_key = st.secrets.get("WEATHER_API_KEY", "default_weather_api_key")
     base_url = "http://api.weatherapi.com/v1/current.json"
@@ -99,43 +103,9 @@ def get_weather(city: str):
     except Exception as e:
         return f"❌ Error fetching weather: {str(e)}"
 
-# ✅ SerpApi search function
-def search_google(query: str):
-    serpapi_key = st.secrets.get("SERPAPI_API_KEY", "default_serpapi_key")
-    if serpapi_key == "default_serpapi_key":
-        return "⚠️ SerpApi key not configured."
-
-    params = {
-        "engine": "google",
-        "q": query,
-        "api_key": serpapi_key,
-        "num": 3
-    }
-
-    try:
-        search = GoogleSearch(params)
-        results = search.get_dict()
-        if "error" in results:
-            return f"❌ SerpApi error: {results['error']}"
-
-        top_results = results.get("organic_results", [])
-        if not top_results:
-            return "🔍 No results found."
-
-        response = "**🔎 Top search results:**\n"
-        for i, result in enumerate(top_results, 1):
-            title = result.get("title", "No title")
-            link = result.get("link", "")
-            snippet = result.get("snippet", "No description.")
-            response += f"{i}. [{title}]({link})\n    _{snippet}_\n\n"
-        return response
-
-    except Exception as e:
-        return f"❌ Failed to search: {str(e)}"
-
-# ✅ Main app logic
 def main():
     initialize_session_state()
+
     sarvam_client = get_sarvam_client()
     tiger_mascot = get_tiger_mascot()
     language_support = get_language_support()
@@ -160,7 +130,7 @@ def main():
 
     st.markdown('<div class="chat-container">', unsafe_allow_html=True)
     st.title("🦁 Mufasa AI")
-    st.markdown("**Your wise AI companion powered by Sarvam AI + Google Search**")
+    st.markdown("**Your wise AI companion powered by Sarvam AI - Ask Mufasa anything!**")
 
     col1, col2, col3 = st.columns([2, 1, 1])
     with col2:
@@ -195,7 +165,6 @@ def main():
             st.markdown(message["content"])
 
     chat_placeholder = language_support.get_chat_placeholder(st.session_state.selected_language)
-
     if prompt := st.chat_input(chat_placeholder):
         if prompt.lower().startswith("weather in"):
             city_name = prompt[10:].strip()
@@ -205,16 +174,6 @@ def main():
                 st.markdown(weather)
             st.session_state.tiger_state = "happy"
             st.rerun()
-
-        elif prompt.lower().startswith("search for"):
-            search_query = prompt[10:].strip()
-            search_result = search_google(search_query)
-            st.session_state.messages.append({"role": "assistant", "content": search_result})
-            with st.chat_message("assistant"):
-                st.markdown(search_result)
-            st.session_state.tiger_state = "excited"
-            st.rerun()
-
         else:
             st.session_state.messages.append({"role": "user", "content": prompt})
             with st.chat_message("user"):
@@ -232,11 +191,10 @@ def main():
                         messages_with_identity.insert(0, system_message)
                     else:
                         messages_with_identity[0] = system_message
-
                     response = sarvam_client.chat_completion(messages=messages_with_identity, temperature=0.8)
                     if response["success"]:
                         ai_response = response["message"]
-                        if st.session_state.auto_translate and st.session_state.selected_language != "en-IN":
+                        if (st.session_state.auto_translate and st.session_state.selected_language != "en-IN"):
                             translation_result = sarvam_client.translate_text(
                                 text=ai_response,
                                 source_language="en-IN",
@@ -245,7 +203,6 @@ def main():
                             if translation_result["success"]:
                                 translated = translation_result["translated_text"]
                                 ai_response = f"{translated}\n\n---\n*Original (English):* {ai_response}"
-
                         st.session_state.tiger_state = "excited"
                         message_placeholder.markdown(ai_response)
                         st.session_state.messages.append({"role": "assistant", "content": ai_response})
@@ -262,14 +219,24 @@ def main():
 
     with st.sidebar:
         st.markdown("### 🦁 Mufasa - Your AI Companion")
-        st.markdown("Mufasa is your wise AI assistant created by **Jeet Borah**.")
-        st.info(language_support.get_welcome_message(st.session_state.selected_language))
+        st.markdown("Mufasa is your wise AI assistant created by **Jeet Borah**. Powered by Sarvam AI, always ready to help.")
+        welcome_msg = language_support.get_welcome_message(st.session_state.selected_language)
+        st.info(welcome_msg)
         st.markdown("### 🌐 Language Features")
-        st.markdown(f"**Current Language:** {language_support.get_language_name(st.session_state.selected_language)}")
-        st.markdown("- 11 Indian Languages supported")
-        st.markdown("- Auto-translation available")
+        current_lang = language_support.get_language_name(st.session_state.selected_language)
+        st.markdown(f"**Current Language:** {current_lang}")
+        st.markdown("- **11 Indian Languages** supported")
+        st.markdown("- **Auto-translation** available")
+        st.markdown("- **Language detection** from your input")
+        st.markdown("- **Native script** support")
         st.markdown("### 🐅 Tiger Mascot States")
-        st.markdown("- Idle, Thinking, Happy, Excited, Sad, Confused")
+        st.markdown("- **Idle**: Waiting for your message")
+        st.markdown("- **Thinking**: Processing")
+        st.markdown("- **Happy**: Responded")
+        st.markdown("- **Excited**: Preparing")
+        st.markdown("- **Sad**: Error")
+        st.markdown("- **Confused**: Unexpected error")
+
         st.markdown("### ☁️ Weather")
         city = st.text_input("Enter city name for weather")
         if st.button("🔍 Get Weather"):
@@ -278,14 +245,17 @@ def main():
                 st.info(weather_report)
             else:
                 st.warning("Please enter a city name.")
+
         if st.button("🗑️ Clear Chat History"):
             st.session_state.messages = []
             st.session_state.tiger_state = "idle"
             st.rerun()
-        if st.secrets.get("SARVAM_API_KEY", "default_api_key") == "default_api_key":
-            st.warning("⚠️ Using default Sarvam API key.")
-        if st.secrets.get("SERPAPI_API_KEY", "default_serpapi_key") == "default_serpapi_key":
-            st.warning("⚠️ Using default SerpApi key.")
+
+        sarvam_api_key = st.secrets.get("SARVAM_API_KEY", "default_api_key")
+        if sarvam_api_key == "default_api_key":
+            st.warning("⚠️ Using default Sarvam API key. Set SARVAM_API_KEY for full functionality.")
+        else:
+            st.success("✅ SARVAM API key configured")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
