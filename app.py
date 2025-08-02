@@ -53,7 +53,7 @@ def apply_dark_theme():
 def apply_light_theme():
     return """
     <style>
-    .stApp { background-color: #ffffff; color: #000000; }
+    .stApp { background-color: #0e1117; color: #ffffff; }
     </style>
     """
 
