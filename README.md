@@ -63,7 +63,6 @@ mufasa-ai/
 ├── tiger_mascot.py        # Tiger mascot animations and states
 ├── image_tiger.py         # Tiger visual components
 ├── README.md             # This file
-├── replit.md             # Project documentation
 └── .streamlit/
     └── config.toml       # Streamlit configuration
 ```
